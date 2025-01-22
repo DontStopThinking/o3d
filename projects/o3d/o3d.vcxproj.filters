@@ -2,5 +2,33 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\code\main.cpp" />
+    <ClCompile Include="..\..\extern\glad\src\glad.c">
+      <Filter>extern\glad</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="extern">
+      <UniqueIdentifier>{59b3f95e-718e-446f-b1f5-eb2b97c6a945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extern\glad">
+      <UniqueIdentifier>{21662a5a-fa19-44b5-91b2-beeaae90ea3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extern\GLFW">
+      <UniqueIdentifier>{67970b8e-ae31-4bc8-85d0-a045cb555799}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\extern\glad\include\glad\glad.h">
+      <Filter>extern\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\extern\glad\include\KHR\khrplatform.h">
+      <Filter>extern\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\extern\glfw-3.4.bin.WIN64\include\GLFW\glfw3native.h">
+      <Filter>extern\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\extern\glfw-3.4.bin.WIN64\include\GLFW\glfw3.h">
+      <Filter>extern\GLFW</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
