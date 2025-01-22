@@ -14,6 +14,6 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\..\READMEx.md" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\README.md" />
   </ItemGroup>
 </Project>
