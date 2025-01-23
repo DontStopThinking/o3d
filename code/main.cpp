@@ -59,6 +59,12 @@ static void ProcessInput()
     }
 }
 
+static void Render()
+{
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
 int main()
 {
     const bool init = Initialize();
@@ -70,6 +76,8 @@ int main()
         while (!glfwWindowShouldClose(g_Window))
         {
             ProcessInput();
+
+            Render();
 
             glfwSwapBuffers(g_Window);
             glfwPollEvents();
