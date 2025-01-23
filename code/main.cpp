@@ -67,11 +67,9 @@ static void Render()
 
 int main()
 {
-    const bool init = Initialize();
-
     int exitCode = EXIT_SUCCESS;
 
-    if (init)
+    if (const bool init = Initialize(); init)
     {
         while (!glfwWindowShouldClose(g_Window))
         {
