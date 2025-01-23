@@ -50,21 +50,39 @@ static bool Initialize()
     return true;
 }
 
+static void ProcessInput()
+{
+    // Escape to close.
+    if (glfwGetKey(g_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(g_Window, true);
+    }
+}
+
 int main()
 {
-    if (!Initialize())
+    const bool init = Initialize();
+
+    int exitCode = EXIT_SUCCESS;
+
+    if (init)
     {
-        glfwTerminate();
-        return EXIT_FAILURE;
+        while (!glfwWindowShouldClose(g_Window))
+        {
+            ProcessInput();
+
+            glfwSwapBuffers(g_Window);
+            glfwPollEvents();
+        }
+    }
+    else
+    {
+        exitCode = EXIT_FAILURE;
     }
 
-    while (!glfwWindowShouldClose(g_Window))
-    {
-        glfwSwapBuffers(g_Window);
-        glfwPollEvents();
-    }
+    LOG_INFO("Shutting down...");
 
     glfwTerminate();
 
-    return EXIT_SUCCESS;
+    return exitCode;
 }
