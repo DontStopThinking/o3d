@@ -30,5 +30,6 @@
     <ClInclude Include="..\..\extern\glfw-3.4.bin.WIN64\include\GLFW\glfw3.h">
       <Filter>extern\GLFW</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\log.h" />
   </ItemGroup>
 </Project>
