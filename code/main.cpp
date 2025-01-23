@@ -63,6 +63,8 @@ static void Render()
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glfwSwapBuffers(g_Window);
 }
 
 int main()
@@ -77,7 +79,6 @@ int main()
 
             Render();
 
-            glfwSwapBuffers(g_Window);
             glfwPollEvents();
         }
     }
