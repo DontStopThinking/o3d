@@ -15,6 +15,7 @@
     <ClCompile Include="..\..\extern\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\code\common.h" />
     <ClInclude Include="..\..\code\log.h" />
     <ClInclude Include="..\..\extern\glad\include\glad\glad.h" />
     <ClInclude Include="..\..\extern\glad\include\KHR\khrplatform.h" />

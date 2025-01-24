@@ -31,5 +31,6 @@
       <Filter>extern\GLFW</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\log.h" />
+    <ClInclude Include="..\..\code\common.h" />
   </ItemGroup>
 </Project>
