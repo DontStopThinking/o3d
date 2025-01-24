@@ -15,8 +15,15 @@ constexpr const char* WINDOW_TITLE = "O3D [RELEASE]";
 #endif
 static constinit GLFWwindow* g_Window = nullptr;
 
-static constinit u32 g_TriangleVAO = 0;
 static constinit u32 g_ShaderProgram = 0;
+static constinit u32 g_VAO = 0;
+
+enum class RenderMethod
+{
+    Fill,
+    Wireframe,
+};
+static constinit RenderMethod g_RenderMethod = RenderMethod::Fill;
 
 constexpr const char* VERTEX_SHADER_SOURCE = R"(
     #version 440 core
@@ -76,12 +83,29 @@ static bool Initialize()
 
     glfwSetFramebufferSizeCallback(g_Window, FrameBufferSizeCallback); // Set window resize callback.
 
-    // Create a triangle.
+    // Create a rectangle.
     constexpr float VERTICES[] =
     {
-        -0.5f, -0.5f, 0.0f,
+        // Rectangle
+        0.5f, 0.5f, 0.0f, // top right
+        0.5f, -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f, // top left
+
+        // Triangle
+        /*-0.5f, -0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f,*/
+    };
+
+    constexpr int INDICES[] =
+    {
+        // Rectangle indices
+        0, 1, 3, // first triangle
+        1, 2, 3, // second triangle
+
+        // Triangle indices
+        //0, 1, 2
     };
 
     // Create vertex buffer object (VBO).
@@ -89,6 +113,10 @@ static bool Initialize()
     glGenBuffers(1, &vbo); // Create vertex buffer object.
     glBindBuffer(GL_ARRAY_BUFFER, vbo); // Specify that that buffer is an array.
     glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW); // Copy triangle vertices into the buffer's memory.
+
+    // Create element buffer object (EBO).
+    u32 ebo;
+    glGenBuffers(1, &ebo); // Generate the EBO buffer.
 
     // Create vertex shader.
     const u32 vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -173,11 +201,18 @@ static bool Initialize()
         (void*)0);          // Offset of where the position data begins in the buffer.
 
     // Create a vertex array object (VAO).
-    glGenVertexArrays(1, &g_TriangleVAO);
-    glBindVertexArray(g_TriangleVAO); // Bind the VAO.
+    glGenVertexArrays(1, &g_VAO);
+    glBindVertexArray(g_VAO); // Bind the VAO.
     // Copy our vertices in a buffer for OpenGL to use.
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, g_VAO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
+
+    // Bind the EBO at the end after binding the VAO. We need to do this at the end because in OpenGL the last EBO that gets
+    // bound while a VAO is bound is stored as that VAO's EBO. Later in Render(), binding to this VAO will automatically
+    // bind the EBO as well.
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); // Bind the EBO buffer.
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(INDICES), INDICES, GL_STATIC_DRAW); // Copy indices into the EBO buffer.
+
     // Set our vertex attributes pointers.
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -192,6 +227,22 @@ static void ProcessInput()
     {
         glfwSetWindowShouldClose(g_Window, true);
     }
+    else if (glfwGetKey(g_Window, GLFW_KEY_1) == GLFW_PRESS)
+    {
+        if (g_RenderMethod != RenderMethod::Wireframe)
+        {
+            g_RenderMethod = RenderMethod::Wireframe;
+            LOG_INFO("Set RenderMethod to \"RenderMethod::Wireframe\"");
+        }
+    }
+    else if (glfwGetKey(g_Window, GLFW_KEY_2) == GLFW_PRESS)
+    {
+        if (g_RenderMethod != RenderMethod::Fill)
+        {
+            g_RenderMethod = RenderMethod::Fill;
+            LOG_INFO("Set RenderMethod to \"RenderMethod::Fill\"");
+        }
+    }
 }
 
 static void Render()
@@ -200,8 +251,16 @@ static void Render()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(g_ShaderProgram);
-    glBindVertexArray(g_TriangleVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(g_VAO);
+    if (g_RenderMethod == RenderMethod::Wireframe)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    else
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(g_Window);
 }
