@@ -1,51 +1,37 @@
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 
 #include <glad/glad.h> // glad.h must be included *before* any OpenGL stuff.
 #include <GLFW/glfw3.h>
 
 #include "common.h"
+#include "vao.h"
+#include "vbo.h"
+#include "ebo.h"
+#include "shader.h"
 
-static constinit int g_WindowWidth = 1024;
-static constinit int g_WindowHeight = 720;
+static int g_WindowWidth = 1024;
+static int g_WindowHeight = 720;
 #if _DEBUG
 constexpr const char* WINDOW_TITLE = "O3D [DEBUG]";
 #else
 constexpr const char* WINDOW_TITLE = "O3D [RELEASE]";
 #endif
-static constinit GLFWwindow* g_Window = nullptr;
+static GLFWwindow* g_Window = nullptr;
 
-static constinit u32 g_ShaderProgram = 0;
-static constinit u32 g_VAO = 0;
+static u32 g_DefaultShader = 0;
+static u32 g_VAO = -1;
+static u32 g_VBO = -1;
+static u32 g_EBO = -1;
 
 enum class RenderMethod
 {
     Fill,
     Wireframe,
 };
-static constinit RenderMethod g_RenderMethod = RenderMethod::Fill;
 
-constexpr const char* VERTEX_SHADER_SOURCE = R"(
-    #version 440 core
-
-    layout (location = 0) in vec3 aPos;
-
-    void main()
-    {
-        gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-    }
-)";
-
-constexpr const char* FRAGMENT_SHADER_SOURCE = R"(
-    #version 440 core
-
-    out vec4 FragColor;
-
-    void main()
-    {
-        FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-    }
-)";
+static RenderMethod g_RenderMethod = RenderMethod::Fill;
 
 // Gets called when the window is resized.
 static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -83,129 +69,38 @@ static bool Initialize()
 
     glfwSetFramebufferSizeCallback(g_Window, FrameBufferSizeCallback); // Set window resize callback.
 
-    // Create vertex shader.
-    const u32 vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &VERTEX_SHADER_SOURCE, nullptr); // Specify shader source.
-    LOG_INFO("Compiling vertex shader...");
-    glCompileShader(vertexShader); // Compile the shader.
-
-    // Check shader compile error.
-    int success;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        constexpr u32 size = 512;
-        char infoLog[size] = {};
-        glGetShaderInfoLog(vertexShader, size, nullptr, infoLog);
-        LOG_ERROR("Vertex shader compilation failed\n%s", infoLog);
-
-        return false;
-    }
-    else
-    {
-        LOG_INFO("Successfully compiled vertex shader.");
-    }
-
-    // Create fragment shader.
-    const u32 fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &FRAGMENT_SHADER_SOURCE, nullptr); // Specify shader source.
-    LOG_INFO("Compiling fragment shader...");
-    glCompileShader(fragmentShader); // Compile the shader.
-
-    // Check shader compile error.
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        constexpr u32 size = 512;
-        char infoLog[size] = {};
-        glGetShaderInfoLog(fragmentShader, size, nullptr, infoLog);
-        LOG_ERROR("Fragment shader compilation failed\n%s", infoLog);
-
-        return false;
-    }
-    else
-    {
-        LOG_INFO("Successfully compiled fragment shader.");
-    }
-
-    // Create shader program (final linked version with multiple shaders combined).
-    g_ShaderProgram = glCreateProgram();
-    LOG_INFO("Linked vertex and fragment shaders...");
-    glAttachShader(g_ShaderProgram, vertexShader); // Attach vertex shader to the program.
-    glAttachShader(g_ShaderProgram, fragmentShader); // Attach fragment shader to the program.
-    glLinkProgram(g_ShaderProgram); // Link program.
-
-    // Check shader program linking error.
-    glGetProgramiv(g_ShaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        constexpr u32 size = 512;
-        char infoLog[size] = {};
-        glGetProgramInfoLog(g_ShaderProgram, size, nullptr, infoLog);
-        LOG_ERROR("Shader program linking error:\n%s", infoLog);
-
-        return false;
-    }
-    else
-    {
-        LOG_INFO("Successfully linked vertex and fragment shaders.");
-    }
-
-    // Delete shader objects; Don't need them anymore after linking succeeds.
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    // Create shader.
+    g_DefaultShader = CreateShader("shaders/default.vert", "shaders/default.frag");
 
     // Create a rectangle.
-    constexpr float VERTICES[] =
+    const float vertices[] =
     {
-        // Rectangle
-        //0.5f, 0.5f, 0.0f, // top right
-        //0.5f, -0.5f, 0.0f, // bottom right
-        //-0.5f, -0.5f, 0.0f, // bottom left
-        //-0.5f, 0.5f, 0.0f, // top left
-
-        // Triangle
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f,
+        -0.5f, (-0.5f * sqrtf(3.0f) / 3.0f), 0.0f, // Lower-left corner
+        0.5f, (-0.5f * sqrtf(3.0f) / 3.0f), 0.0f, // Lower-right corner
+        0.0f, (0.5f * sqrtf(3.0f) * 2.0f / 3.0f), 0.0f, // Upper corner
+        -0.5f / 2.0f, (0.5f * sqrtf(3.0f) / 6.0f), 0.0f, // Inner left
+        0.5f / 2.0f, (0.5f * sqrtf(3.0f) / 6.0f), 0.0f, // Inner right
+        0.0f, (-0.5f * sqrtf(3.0f) / 3.0f), 0.0f, // Inner down
     };
 
-    constexpr int INDICES[] =
+    constexpr u32 INDICES[] =
     {
-        // Rectangle indices
-        //0, 1, 3, // first triangle
-        //1, 2, 3, // second triangle
-
-        // Triangle indices
-        0, 1, 2
+        0, 3, 5, // lower left triangle
+        3, 2, 4, // lower right triangle
+        5, 4, 1, // Upper triangle
     };
 
-    // Create vertex buffer object (VBO).
-    u32 vbo;
+    g_VAO = CreateVAO();
+    BindVAO(g_VAO);
 
-    glGenVertexArrays(1, &g_VAO);
-    glGenBuffers(1, &vbo); // Create vertex buffer object.
+    g_VBO = CreateVBO(vertices, sizeof(vertices));
+    g_EBO = CreateEBO(INDICES, sizeof(INDICES));
 
-    glBindVertexArray(g_VAO);
+    LinkVBO(g_VBO, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo); // Specify that that buffer is an array.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW); // Copy triangle vertices into the buffer's memory.
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    // Create element buffer object (EBO).
-    u32 ebo;
-    glGenBuffers(1, &ebo); // Generate the EBO buffer.
-
-    // Bind the EBO at the end after binding the VAO. We need to do this at the end because in OpenGL the last EBO that gets
-    // bound while a VAO is bound is stored as that VAO's EBO. Later in Render(), binding to this VAO will automatically
-    // bind the EBO as well.
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); // Bind the EBO buffer.
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(INDICES), INDICES, GL_STATIC_DRAW); // Copy indices into the EBO buffer.
+    UnbindVAO();
+    UnbindVBO();
+    UnbindEBO();
 
     return true;
 }
@@ -240,8 +135,10 @@ static void Render()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(g_ShaderProgram);
-    glBindVertexArray(g_VAO);
+    ActivateShader(g_DefaultShader);
+
+    BindVAO(g_VAO);
+
     if (g_RenderMethod == RenderMethod::Wireframe)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -250,17 +147,20 @@ static void Render()
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(g_Window);
+
+    UnbindVAO();
 }
 
 static void FreeResources()
 {
-    // TODO(sbalse): Delete vbos.
-    glDeleteVertexArrays(1, &g_VAO);
-    glDeleteProgram(g_ShaderProgram);
+    DeleteVAO(g_VAO);
+    DeleteEBO(g_EBO);
+    DeleteVBO(g_VBO);
+    DeleteShader(g_DefaultShader);
 }
 
 int main()

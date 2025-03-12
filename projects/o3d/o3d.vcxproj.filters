@@ -5,6 +5,10 @@
     <ClCompile Include="..\..\extern\glad\src\glad.c">
       <Filter>extern\glad</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\code\shader.cpp" />
+    <ClCompile Include="..\..\code\vbo.cpp" />
+    <ClCompile Include="..\..\code\ebo.cpp" />
+    <ClCompile Include="..\..\code\vao.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extern">
@@ -15,6 +19,9 @@
     </Filter>
     <Filter Include="extern\GLFW">
       <UniqueIdentifier>{67970b8e-ae31-4bc8-85d0-a045cb555799}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{8d26d4d1-1536-4a58-b24c-e3228e51054d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,5 +39,17 @@
     </ClInclude>
     <ClInclude Include="..\..\code\log.h" />
     <ClInclude Include="..\..\code\common.h" />
+    <ClInclude Include="..\..\code\shader.h" />
+    <ClInclude Include="..\..\code\vbo.h" />
+    <ClInclude Include="..\..\code\ebo.h" />
+    <ClInclude Include="..\..\code\vao.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\data\shaders\default.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\..\data\shaders\default.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

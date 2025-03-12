@@ -11,16 +11,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\code\ebo.cpp" />
     <ClCompile Include="..\..\code\main.cpp" />
+    <ClCompile Include="..\..\code\shader.cpp" />
+    <ClCompile Include="..\..\code\vao.cpp" />
+    <ClCompile Include="..\..\code\vbo.cpp" />
     <ClCompile Include="..\..\extern\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\common.h" />
+    <ClInclude Include="..\..\code\ebo.h" />
     <ClInclude Include="..\..\code\log.h" />
+    <ClInclude Include="..\..\code\shader.h" />
+    <ClInclude Include="..\..\code\vao.h" />
+    <ClInclude Include="..\..\code\vbo.h" />
     <ClInclude Include="..\..\extern\glad\include\glad\glad.h" />
     <ClInclude Include="..\..\extern\glad\include\KHR\khrplatform.h" />
     <ClInclude Include="..\..\extern\glfw-3.4.bin.WIN64\include\GLFW\glfw3.h" />
     <ClInclude Include="..\..\extern\glfw-3.4.bin.WIN64\include\GLFW\glfw3native.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\data\shaders\default.frag" />
+    <None Include="..\..\data\shaders\default.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -75,7 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,7 +103,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
