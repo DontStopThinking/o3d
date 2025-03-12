@@ -9,10 +9,18 @@ u32 CreateVAO()
     return result;
 }
 
-void LinkVBO(const u32 vboID, const u32 layout)
+void LinkAttrib(
+    const u32 vboID,
+    const u32 layout,
+    const u32 numComponents,
+    const u32 type,
+    const u32 stride,
+    const void* const offset
+)
 {
     BindVBO(vboID);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    // Tell OpenGL how to interpret our array of vertices.
+    glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
     glEnableVertexAttribArray(layout);
     UnbindVBO();
 }

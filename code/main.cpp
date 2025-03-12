@@ -74,13 +74,13 @@ static bool Initialize()
 
     // Create a rectangle.
     const float vertices[] =
-    {
-        -0.5f, (-0.5f * sqrtf(3.0f) / 3.0f), 0.0f, // Lower-left corner
-        0.5f, (-0.5f * sqrtf(3.0f) / 3.0f), 0.0f, // Lower-right corner
-        0.0f, (0.5f * sqrtf(3.0f) * 2.0f / 3.0f), 0.0f, // Upper corner
-        -0.5f / 2.0f, (0.5f * sqrtf(3.0f) / 6.0f), 0.0f, // Inner left
-        0.5f / 2.0f, (0.5f * sqrtf(3.0f) / 6.0f), 0.0f, // Inner right
-        0.0f, (-0.5f * sqrtf(3.0f) / 3.0f), 0.0f, // Inner down
+    {//                   COORDINATES                             RGB COLORS
+        -0.5f,  (-0.5f  * sqrtf(3.0f) / 3.0f),        0.0f,    0.8f, 0.3f, 0.02f,    // Lower-left corner
+         0.5f,  (-0.5f  * sqrtf(3.0f) / 3.0f),        0.0f,    0.8f, 0.3f, 0.02f,    // Lower-right corner
+         0.0f,  ( 0.5f  * sqrtf(3.0f) * 2.0f / 3.0f), 0.0f,    1.0f, 0.6f, 0.32f,    // Upper corner
+        -0.25f, ( 0.5f  * sqrtf(3.0f) / 6.0f),        0.0f,    0.9f, 0.45f, 0.17f,   // Inner left
+         0.25f, ( 0.5f  * sqrtf(3.0f) / 6.0f),        0.0f,    0.9f, 0.45f, 0.17f,   // Inner right
+         0.0f,  (-0.5f  * sqrtf(3.0f) / 3.0f),        0.0f,    0.8f, 0.3f, 0.02f,    // Inner down
     };
 
     constexpr u32 INDICES[] =
@@ -96,7 +96,8 @@ static bool Initialize()
     g_VBO = CreateVBO(vertices, sizeof(vertices));
     g_EBO = CreateEBO(INDICES, sizeof(INDICES));
 
-    LinkVBO(g_VBO, 0);
+    LinkAttrib(g_VBO, 0, 3, GL_FLOAT, 6 * sizeof(float), 0); // Coordinates
+    LinkAttrib(g_VBO, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float))); // Colors
 
     UnbindVAO();
     UnbindVBO();
