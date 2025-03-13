@@ -6,10 +6,12 @@
 #include <GLFW/glfw3.h>
 
 #include "common.h"
-#include "vao.h"
-#include "vbo.h"
-#include "ebo.h"
-#include "shader.h"
+#include "graphics/vao.h"
+#include "graphics/vbo.h"
+#include "graphics/ebo.h"
+#include "graphics/shader.h"
+
+// Timestamp: https://youtu.be/45MIykWJ-C4
 
 static int g_WindowWidth = 1024;
 static int g_WindowHeight = 720;

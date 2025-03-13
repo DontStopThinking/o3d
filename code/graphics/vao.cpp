@@ -1,4 +1,4 @@
-#include "vao.h"
+#include "graphics/vao.h"
 
 #include <glad/glad.h>
 

@@ -1,4 +1,4 @@
-#include "ebo.h"
+#include "graphics/ebo.h"
 
 #include <glad/glad.h>
 

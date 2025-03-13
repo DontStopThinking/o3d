@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vbo.h"
+#include "graphics/vbo.h"
 
 // Create a vertex array object and return its ID.
 u32 CreateVAO();

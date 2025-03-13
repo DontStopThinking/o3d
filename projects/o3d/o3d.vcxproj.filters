@@ -5,10 +5,18 @@
     <ClCompile Include="..\..\extern\glad\src\glad.c">
       <Filter>extern\glad</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\shader.cpp" />
-    <ClCompile Include="..\..\code\vbo.cpp" />
-    <ClCompile Include="..\..\code\ebo.cpp" />
-    <ClCompile Include="..\..\code\vao.cpp" />
+    <ClCompile Include="..\..\code\graphics\ebo.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\graphics\shader.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\graphics\vao.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\graphics\vbo.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extern">
@@ -22,6 +30,9 @@
     </Filter>
     <Filter Include="shaders">
       <UniqueIdentifier>{8d26d4d1-1536-4a58-b24c-e3228e51054d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphics">
+      <UniqueIdentifier>{7e4a3ce3-cbde-417f-9efa-c8ef9ff4e88d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,10 +50,18 @@
     </ClInclude>
     <ClInclude Include="..\..\code\log.h" />
     <ClInclude Include="..\..\code\common.h" />
-    <ClInclude Include="..\..\code\shader.h" />
-    <ClInclude Include="..\..\code\vbo.h" />
-    <ClInclude Include="..\..\code\ebo.h" />
-    <ClInclude Include="..\..\code\vao.h" />
+    <ClInclude Include="..\..\code\graphics\ebo.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\graphics\shader.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\graphics\vao.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\graphics\vbo.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\data\shaders\default.frag">

@@ -11,20 +11,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\code\ebo.cpp" />
+    <ClCompile Include="..\..\code\graphics\ebo.cpp" />
+    <ClCompile Include="..\..\code\graphics\shader.cpp" />
+    <ClCompile Include="..\..\code\graphics\vao.cpp" />
+    <ClCompile Include="..\..\code\graphics\vbo.cpp" />
     <ClCompile Include="..\..\code\main.cpp" />
-    <ClCompile Include="..\..\code\shader.cpp" />
-    <ClCompile Include="..\..\code\vao.cpp" />
-    <ClCompile Include="..\..\code\vbo.cpp" />
     <ClCompile Include="..\..\extern\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\common.h" />
-    <ClInclude Include="..\..\code\ebo.h" />
+    <ClInclude Include="..\..\code\graphics\ebo.h" />
+    <ClInclude Include="..\..\code\graphics\shader.h" />
+    <ClInclude Include="..\..\code\graphics\vao.h" />
+    <ClInclude Include="..\..\code\graphics\vbo.h" />
     <ClInclude Include="..\..\code\log.h" />
-    <ClInclude Include="..\..\code\shader.h" />
-    <ClInclude Include="..\..\code\vao.h" />
-    <ClInclude Include="..\..\code\vbo.h" />
     <ClInclude Include="..\..\extern\glad\include\glad\glad.h" />
     <ClInclude Include="..\..\extern\glad\include\KHR\khrplatform.h" />
     <ClInclude Include="..\..\extern\glfw-3.4.bin.WIN64\include\GLFW\glfw3.h" />
@@ -74,12 +74,14 @@
     <IntDir>$(SolutionDir)..\tmp\$(Configuration)\$(ProjectName)\</IntDir>
     <ExternalIncludePath>$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\include\;$(SolutionDir)\..\extern\glad\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\lib-vc2022\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\..\code\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)..\tmp\$(Configuration)\$(ProjectName)\</IntDir>
     <ExternalIncludePath>$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\include\;$(SolutionDir)\..\extern\glad\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\lib-vc2022\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\..\code\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
