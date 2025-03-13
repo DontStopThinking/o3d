@@ -15,11 +15,6 @@
 
 static int g_WindowWidth = 1024;
 static int g_WindowHeight = 720;
-#if _DEBUG
-constexpr const char* WINDOW_TITLE = "O3D [DEBUG]";
-#else
-constexpr const char* WINDOW_TITLE = "O3D [RELEASE]";
-#endif
 static GLFWwindow* g_Window = nullptr;
 
 static u32 g_DefaultShader = 0;
@@ -50,6 +45,12 @@ static bool Initialize()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#if _DEBUG
+    constexpr const char* WINDOW_TITLE = "O3D [DEBUG]";
+#else
+    constexpr const char* WINDOW_TITLE = "O3D [RELEASE]";
+#endif // _DEBUG
 
     g_Window = glfwCreateWindow(g_WindowWidth, g_WindowHeight, WINDOW_TITLE, nullptr, nullptr);
     if (g_Window == nullptr)
@@ -110,11 +111,14 @@ static bool Initialize()
 
 static void ProcessInput()
 {
+    glfwPollEvents();
+
     // Escape to close.
     if (glfwGetKey(g_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(g_Window, true);
     }
+    // 1 to switch to wireframe render.
     else if (glfwGetKey(g_Window, GLFW_KEY_1) == GLFW_PRESS)
     {
         if (g_RenderMethod != RenderMethod::Wireframe)
@@ -123,6 +127,7 @@ static void ProcessInput()
             LOG_INFO("Set RenderMethod to \"RenderMethod::Wireframe\"");
         }
     }
+    // 2 to switch to filled render.
     else if (glfwGetKey(g_Window, GLFW_KEY_2) == GLFW_PRESS)
     {
         if (g_RenderMethod != RenderMethod::Fill)
@@ -177,8 +182,6 @@ int main()
             ProcessInput();
 
             Render();
-
-            glfwPollEvents();
         }
     }
     else
