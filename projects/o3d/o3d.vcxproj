@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\code\graphics\ebo.cpp" />
     <ClCompile Include="..\..\code\graphics\shader.cpp" />
+    <ClCompile Include="..\..\code\graphics\texture.cpp" />
     <ClCompile Include="..\..\code\graphics\vao.cpp" />
     <ClCompile Include="..\..\code\graphics\vbo.cpp" />
     <ClCompile Include="..\..\code\main.cpp" />
@@ -22,6 +23,7 @@
     <ClInclude Include="..\..\code\common.h" />
     <ClInclude Include="..\..\code\graphics\ebo.h" />
     <ClInclude Include="..\..\code\graphics\shader.h" />
+    <ClInclude Include="..\..\code\graphics\texture.h" />
     <ClInclude Include="..\..\code\graphics\vao.h" />
     <ClInclude Include="..\..\code\graphics\vbo.h" />
     <ClInclude Include="..\..\code\log.h" />

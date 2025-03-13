@@ -17,6 +17,9 @@
     <ClCompile Include="..\..\code\graphics\vbo.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\code\graphics\texture.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extern">
@@ -67,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="..\..\extern\stb\stb_image.h">
       <Filter>extern\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\graphics\texture.h">
+      <Filter>graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,7 @@
 #include "graphics/vbo.h"
 #include "graphics/ebo.h"
 #include "graphics/shader.h"
+#include "graphics/texture.h"
 
 // Timestamp: https://youtu.be/45MIykWJ-C4
 
@@ -19,12 +20,13 @@ static int g_WindowWidth = 1024;
 static int g_WindowHeight = 720;
 static GLFWwindow* g_Window = nullptr;
 
-static u32 g_DefaultShader = 0;
 static u32 g_VAO = -1;
 static u32 g_VBO = -1;
 static u32 g_EBO = -1;
+static u32 g_DefaultShader = 0;
+static Texture g_PopCatTexture = {};
 
-static u32 g_UniformScaleID = -1;
+static u32 g_UniformScale = -1;
 
 enum class RenderMethod
 {
@@ -102,12 +104,30 @@ static bool Initialize()
 
     LinkAttrib(g_VBO, 0, 3, GL_FLOAT, 8 * sizeof(float), 0); // Coordinates
     LinkAttrib(g_VBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float))); // Colors
+    LinkAttrib(g_VBO, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float))); // Texture Coordinates.
 
     UnbindVAO();
     UnbindVBO();
     UnbindEBO();
 
-    g_UniformScaleID = glGetUniformLocation(g_DefaultShader, "scale");
+    // Get ID of uniform variable called "scale".
+    g_UniformScale = glGetUniformLocation(g_DefaultShader, "scale");
+
+    // Texture
+    stbi_set_flip_vertically_on_load(true); // OpenGL reads images from bottom-left corder to top-right corner.
+                                            // Whereas STB_Image by default reads them from the top-left corner
+                                            // to the bottom-right corner. So we use this to make STB_Image's
+                                            // behaviour more similar to OpenGL.
+
+    g_PopCatTexture = CreateTexture(
+        "textures/pop_cat.png",
+        GL_TEXTURE_2D,
+        GL_TEXTURE0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE
+    );
+
+    SetTextureUnit(g_DefaultShader, "tex0", 0);
 
     return true;
 }
@@ -148,7 +168,9 @@ static void Render()
 
     ActivateShader(g_DefaultShader);
 
-    glUniform1f(g_UniformScaleID, 0.5f);
+    BindTexture(g_PopCatTexture);
+
+    glUniform1f(g_UniformScale, 0.5f);
 
     BindVAO(g_VAO);
 
@@ -174,6 +196,7 @@ static void FreeResources()
     DeleteEBO(g_EBO);
     DeleteVBO(g_VBO);
     DeleteShader(g_DefaultShader);
+    DeleteTexture(g_PopCatTexture);
 }
 
 int main()
