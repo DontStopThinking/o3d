@@ -22,6 +22,8 @@ static u32 g_VAO = -1;
 static u32 g_VBO = -1;
 static u32 g_EBO = -1;
 
+static u32 g_UniformScaleID = -1;
+
 enum class RenderMethod
 {
     Fill,
@@ -106,6 +108,8 @@ static bool Initialize()
     UnbindVBO();
     UnbindEBO();
 
+    g_UniformScaleID = glGetUniformLocation(g_DefaultShader, "scale");
+
     return true;
 }
 
@@ -144,6 +148,8 @@ static void Render()
     glClear(GL_COLOR_BUFFER_BIT);
 
     ActivateShader(g_DefaultShader);
+
+    glUniform1f(g_UniformScaleID, 0.5f);
 
     BindVAO(g_VAO);
 
