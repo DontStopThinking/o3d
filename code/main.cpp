@@ -140,7 +140,7 @@ static void ProcessInput()
 
 static void Render()
 {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ActivateShader(g_DefaultShader);
