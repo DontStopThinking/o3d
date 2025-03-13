@@ -4,6 +4,8 @@
 
 #include <glad/glad.h> // glad.h must be included *before* any OpenGL stuff.
 #include <GLFW/glfw3.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 #include "common.h"
 #include "graphics/vao.h"
@@ -78,31 +80,28 @@ static bool Initialize()
     g_DefaultShader = CreateShader("shaders/default.vert", "shaders/default.frag");
 
     // Create a rectangle.
-    const float vertices[] =
-    {//                   COORDINATES                             RGB COLORS
-        -0.5f,  (-0.5f  * sqrtf(3.0f) / 3.0f),        0.0f,    0.8f, 0.3f, 0.02f,    // Lower-left corner
-         0.5f,  (-0.5f  * sqrtf(3.0f) / 3.0f),        0.0f,    0.8f, 0.3f, 0.02f,    // Lower-right corner
-         0.0f,  ( 0.5f  * sqrtf(3.0f) * 2.0f / 3.0f), 0.0f,    1.0f, 0.6f, 0.32f,    // Upper corner
-        -0.25f, ( 0.5f  * sqrtf(3.0f) / 6.0f),        0.0f,    0.9f, 0.45f, 0.17f,   // Inner left
-         0.25f, ( 0.5f  * sqrtf(3.0f) / 6.0f),        0.0f,    0.9f, 0.45f, 0.17f,   // Inner right
-         0.0f,  (-0.5f  * sqrtf(3.0f) / 3.0f),        0.0f,    0.8f, 0.3f, 0.02f,    // Inner down
+    constexpr float VERTICES[] =
+    { //     COORDINATES     /        COLORS      /   TexCoord
+        -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
+        -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
+         0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
+         0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
     };
 
     constexpr u32 INDICES[] =
     {
-        0, 3, 5, // lower left triangle
-        3, 2, 4, // lower right triangle
-        5, 4, 1, // Upper triangle
+        0, 2, 1, // Upper triangle.
+        0, 3, 2, // Lower triangle.
     };
 
     g_VAO = CreateVAO();
     BindVAO(g_VAO);
 
-    g_VBO = CreateVBO(vertices, sizeof(vertices));
+    g_VBO = CreateVBO(VERTICES, sizeof(VERTICES));
     g_EBO = CreateEBO(INDICES, sizeof(INDICES));
 
-    LinkAttrib(g_VBO, 0, 3, GL_FLOAT, 6 * sizeof(float), 0); // Coordinates
-    LinkAttrib(g_VBO, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float))); // Colors
+    LinkAttrib(g_VBO, 0, 3, GL_FLOAT, 8 * sizeof(float), 0); // Coordinates
+    LinkAttrib(g_VBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float))); // Colors
 
     UnbindVAO();
     UnbindVBO();
@@ -162,7 +161,7 @@ static void Render()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(g_Window);
 

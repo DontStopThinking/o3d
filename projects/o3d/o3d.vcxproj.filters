@@ -34,6 +34,9 @@
     <Filter Include="graphics">
       <UniqueIdentifier>{7e4a3ce3-cbde-417f-9efa-c8ef9ff4e88d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="extern\stb">
+      <UniqueIdentifier>{7db2cbcc-eec0-45e1-a5d5-eba4fe93bd51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\extern\glad\include\glad\glad.h">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="..\..\code\graphics\vbo.h">
       <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\extern\stb\stb_image.h">
+      <Filter>extern\stb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
