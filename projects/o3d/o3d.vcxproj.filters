@@ -20,6 +20,7 @@
     <ClCompile Include="..\..\code\graphics\texture.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\code\stb.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extern">

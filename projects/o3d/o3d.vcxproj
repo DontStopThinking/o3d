@@ -17,6 +17,7 @@
     <ClCompile Include="..\..\code\graphics\vao.cpp" />
     <ClCompile Include="..\..\code\graphics\vbo.cpp" />
     <ClCompile Include="..\..\code\main.cpp" />
+    <ClCompile Include="..\..\code\stb.cpp" />
     <ClCompile Include="..\..\extern\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
@@ -75,14 +76,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)..\tmp\$(Configuration)\$(ProjectName)\</IntDir>
-    <ExternalIncludePath>$(SolutionDir)\..\extern\stb\;$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\include\;$(SolutionDir)\..\extern\glad\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)\..\extern\glm-1.0.1\;$(SolutionDir)\..\extern\stb\;$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\include\;$(SolutionDir)\..\extern\glad\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\lib-vc2022\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)\..\code\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)..\tmp\$(Configuration)\$(ProjectName)\</IntDir>
-    <ExternalIncludePath>$(SolutionDir)\..\extern\stb\;$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\include\;$(SolutionDir)\..\extern\glad\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)\..\extern\glm-1.0.1\;$(SolutionDir)\..\extern\stb\;$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\include\;$(SolutionDir)\..\extern\glad\include\;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(SolutionDir)\..\extern\glfw-3.4.bin.WIN64\lib-vc2022\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)\..\code\;$(IncludePath)</IncludePath>
   </PropertyGroup>

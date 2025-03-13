@@ -4,8 +4,10 @@
 
 #include <glad/glad.h> // glad.h must be included *before* any OpenGL stuff.
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "common.h"
 #include "graphics/vao.h"
@@ -16,6 +18,12 @@
 
 // Timestamp: https://youtu.be/45MIykWJ-C4
 
+enum class RenderMethod
+{
+    Fill,
+    Wireframe,
+};
+
 static int g_WindowWidth = 1024;
 static int g_WindowHeight = 720;
 static GLFWwindow* g_Window = nullptr;
@@ -24,17 +32,32 @@ static u32 g_VAO = -1;
 static u32 g_VBO = -1;
 static u32 g_EBO = -1;
 static u32 g_DefaultShader = 0;
-static Texture g_PopCatTexture = {};
+static Texture g_Texture = {};
 
 static u32 g_UniformScale = -1;
 
-enum class RenderMethod
-{
-    Fill,
-    Wireframe,
-};
+static float g_Rotation = 0.0f;
 
 static RenderMethod g_RenderMethod = RenderMethod::Fill;
+
+constexpr float VERTICES[] =
+{ //     COORDINATES     /        COLORS      /   TexCoord
+    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+    0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+    0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+    0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f,
+};
+
+constexpr u32 INDICES[] =
+{
+    0, 1, 2,
+    0, 2, 3,
+    0, 1, 4,
+    1, 2, 4,
+    2, 3, 4,
+    3, 0, 4,
+};
 
 // Gets called when the window is resized.
 static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -78,23 +101,10 @@ static bool Initialize()
 
     glfwSetFramebufferSizeCallback(g_Window, FrameBufferSizeCallback); // Set window resize callback.
 
+    glEnable(GL_DEPTH_TEST);
+
     // Create shader.
     g_DefaultShader = CreateShader("shaders/default.vert", "shaders/default.frag");
-
-    // Create a rectangle.
-    constexpr float VERTICES[] =
-    { //     COORDINATES     /        COLORS      /   TexCoord
-        -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
-        -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
-         0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
-         0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
-    };
-
-    constexpr u32 INDICES[] =
-    {
-        0, 2, 1, // Upper triangle.
-        0, 3, 2, // Lower triangle.
-    };
 
     g_VAO = CreateVAO();
     BindVAO(g_VAO);
@@ -119,8 +129,8 @@ static bool Initialize()
                                             // to the bottom-right corner. So we use this to make STB_Image's
                                             // behaviour more similar to OpenGL.
 
-    g_PopCatTexture = CreateTexture(
-        "textures/pop_cat.png",
+    g_Texture = CreateTexture(
+        "textures/brick.png",
         GL_TEXTURE_2D,
         GL_TEXTURE0,
         GL_RGBA,
@@ -161,15 +171,43 @@ static void ProcessInput()
     }
 }
 
+static void Update(const float dt)
+{
+    g_Rotation += 30.0f * dt;
+}
+
 static void Render()
 {
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ActivateShader(g_DefaultShader);
 
-    BindTexture(g_PopCatTexture);
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 proj = glm::mat4(1.0f);
 
+    view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
+    proj = glm::perspective(
+        glm::radians(45.0f), scast<float>(g_WindowWidth / g_WindowHeight), 0.1f, 100.0f
+    );
+
+    // Make our model rotate.
+    model = glm::rotate(model, glm::radians(g_Rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    i32 modelLoc = glGetUniformLocation(g_DefaultShader, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    i32 viewLoc = glGetUniformLocation(g_DefaultShader, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+    i32 projLoc = glGetUniformLocation(g_DefaultShader, "proj");
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+
+    // Set texture.
+    BindTexture(g_Texture);
+
+    // Set the scale uniform variable.
     glUniform1f(g_UniformScale, 0.5f);
 
     BindVAO(g_VAO);
@@ -183,7 +221,7 @@ static void Render()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sizeof(INDICES), GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(g_Window);
 
@@ -196,7 +234,7 @@ static void FreeResources()
     DeleteEBO(g_EBO);
     DeleteVBO(g_VBO);
     DeleteShader(g_DefaultShader);
-    DeleteTexture(g_PopCatTexture);
+    DeleteTexture(g_Texture);
 }
 
 int main()
@@ -205,9 +243,19 @@ int main()
 
     if (const bool init = Initialize(); init)
     {
+        double prevTime = glfwGetTime();
+        double currTime = prevTime;
+        double deltaTime = 0.0;
+
         while (!glfwWindowShouldClose(g_Window))
         {
+            currTime = glfwGetTime();
+            deltaTime = currTime - prevTime;
+            prevTime = currTime;
+
             ProcessInput();
+
+            Update(scast<float>(deltaTime));
 
             Render();
         }
