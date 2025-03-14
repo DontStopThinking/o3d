@@ -32,29 +32,76 @@ static GLFWwindow* g_Window = nullptr;
 static u32 g_VAO = -1;
 static u32 g_VBO = -1;
 static u32 g_EBO = -1;
-static u32 g_DefaultShader = 0;
+static u32 g_LightVAO = -1;
+static u32 g_LightVBO = -1;
+static u32 g_LightEBO = -1;
+static u32 g_DefaultShader = -1;
+static u32 g_LightShader = -1;
 static Texture g_Texture = {};
 static Camera g_Camera = {};
 
 static RenderMethod g_RenderMethod = RenderMethod::Fill;
 
 constexpr float VERTICES[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord
-    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-    0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-    0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-    0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f,
+{ //     COORDINATES     /        COLORS           /   TexCoord   /       Normals
+    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+
+    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+
+    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+
+     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
+
+     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
 };
 
 constexpr u32 INDICES[] =
 {
+    0, 1, 2, // Bottom side
+    0, 2, 3, // Bottom side
+    4, 6, 5, // Left side
+    7, 9, 8, // Non-facing side
+    10, 12, 11, // Right side
+    13, 15, 14 // Facing side
+};
+
+constexpr float LIGHT_VERTICES[] =
+{ //     COORDINATES     //
+    -0.1f, -0.1f,  0.1f,
+    -0.1f, -0.1f, -0.1f,
+     0.1f, -0.1f, -0.1f,
+     0.1f, -0.1f,  0.1f,
+    -0.1f,  0.1f,  0.1f,
+    -0.1f,  0.1f, -0.1f,
+     0.1f,  0.1f, -0.1f,
+     0.1f,  0.1f,  0.1f
+};
+
+constexpr u32 LIGHT_INDICES[] =
+{
     0, 1, 2,
     0, 2, 3,
-    0, 1, 4,
-    1, 2, 4,
-    2, 3, 4,
-    3, 0, 4,
+    0, 4, 7,
+    0, 7, 3,
+    3, 7, 6,
+    3, 6, 2,
+    2, 6, 5,
+    2, 5, 1,
+    1, 5, 4,
+    1, 4, 0,
+    4, 5, 6,
+    4, 6, 7
 };
 
 // Gets called when the window is resized.
@@ -67,7 +114,7 @@ static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
 
 static bool Initialize()
 {
-    // Initialize GLFW.
+    // SECTION: Initialize GLFW.
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -88,7 +135,7 @@ static bool Initialize()
 
     glfwMakeContextCurrent(g_Window);
 
-    // Initialize GLAD.
+    // SECTION: Initialize GLAD.
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         LOG_ERROR("Failed to initialize GLAD.");
@@ -101,7 +148,7 @@ static bool Initialize()
 
     glEnable(GL_DEPTH_TEST);
 
-    // Create shader.
+    // SECTION: Create default shader.
     g_DefaultShader = CreateShader("shaders/default.vert", "shaders/default.frag");
 
     g_VAO = CreateVAO();
@@ -110,15 +157,78 @@ static bool Initialize()
     g_VBO = CreateVBO(VERTICES, sizeof(VERTICES));
     g_EBO = CreateEBO(INDICES, sizeof(INDICES));
 
-    LinkAttrib(g_VBO, 0, 3, GL_FLOAT, 8 * sizeof(float), 0); // Coordinates
-    LinkAttrib(g_VBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float))); // Colors
-    LinkAttrib(g_VBO, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float))); // Texture Coordinates.
+    LinkAttrib(g_VBO, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0); // Coordinates
+    LinkAttrib(g_VBO, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float))); // Colors
+    LinkAttrib(g_VBO, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float))); // Texture Coordinates.
+    LinkAttrib(g_VBO, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float))); // Normals
 
     UnbindVAO();
     UnbindVBO();
     UnbindEBO();
 
-    // Texture
+    // SECTION: Create light shader.
+    g_LightShader = CreateShader("shaders/light.vert", "shaders/light.frag");
+
+    g_LightVAO = CreateVAO();
+    BindVAO(g_LightVAO);
+
+    g_LightVBO = CreateVBO(LIGHT_VERTICES, sizeof(LIGHT_VERTICES));
+
+    g_LightEBO = CreateEBO(LIGHT_INDICES, sizeof(LIGHT_INDICES));
+
+    LinkAttrib(g_LightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+
+    UnbindVAO();
+    UnbindEBO();
+    UnbindVBO();
+
+    // SECTION: Pass values to shader uniforms.
+    const glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    const glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+    glm::mat4 lightModel = glm::mat4(1.0f);
+    lightModel = glm::translate(lightModel, lightPos);
+
+    const glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::mat4 pyramidModel = glm::mat4(1.0f);
+    pyramidModel = glm::translate(pyramidModel, pyramidPos);
+
+    ActivateShader(g_LightShader);
+    glUniformMatrix4fv(
+        glGetUniformLocation(g_LightShader, "model"),
+        1,
+        GL_FALSE,
+        glm::value_ptr(lightModel)
+    );
+    glUniform4f(
+        glGetUniformLocation(g_LightShader, "lightColor"),
+        lightColor.x,
+        lightColor.y,
+        lightColor.z,
+        lightColor.w
+    );
+
+    ActivateShader(g_DefaultShader);
+    glUniformMatrix4fv(
+        glGetUniformLocation(g_DefaultShader, "model"),
+        1,
+        GL_FALSE,
+        glm::value_ptr(pyramidModel)
+    );
+    glUniform4f(
+        glGetUniformLocation(g_DefaultShader, "lightColor"),
+        lightColor.x,
+        lightColor.y,
+        lightColor.z,
+        lightColor.w
+    );
+    glUniform3f(
+        glGetUniformLocation(g_DefaultShader, "lightPos"),
+        lightPos.x,
+        lightPos.y,
+        lightPos.z
+    );
+
+    // SECTION: Texture
     stbi_set_flip_vertically_on_load(true); // OpenGL reads images from bottom-left corder to top-right corner.
                                             // Whereas STB_Image by default reads them from the top-left corner
                                             // to the bottom-right corner. So we use this to make STB_Image's
@@ -134,6 +244,7 @@ static bool Initialize()
 
     SetTextureUnit(g_DefaultShader, "tex0", 0);
 
+    // SECTION: Camera
     g_Camera = CreateCamera(g_WindowWidth, g_WindowHeight, glm::vec3(0.0f, 0.0f, 2.0f));
 
     return true;
@@ -179,16 +290,16 @@ static void Render()
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    ActivateShader(g_DefaultShader);
-
-    SetCameraMatrix(
+    UpdateCameraMatrix(
         g_Camera,
         45.0f,
         0.1f,
-        100.0f,
-        g_DefaultShader,
-        "camMatrix"
+        100.0f
     );
+
+    ActivateShader(g_DefaultShader);
+
+    ExportCameraMatrixToShader(g_Camera, g_DefaultShader, "camMatrix");
 
     // Set texture.
     BindTexture(g_Texture);
@@ -204,7 +315,15 @@ static void Render()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    glDrawElements(GL_TRIANGLES, sizeof(INDICES), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sizeof(INDICES) / sizeof(u32), GL_UNSIGNED_INT, 0);
+
+    ActivateShader(g_LightShader);
+
+    ExportCameraMatrixToShader(g_Camera, g_LightShader, "camMatrix");
+
+    BindVAO(g_LightVAO);
+
+    glDrawElements(GL_TRIANGLES, sizeof(LIGHT_INDICES) / sizeof(u32), GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(g_Window);
 
@@ -217,6 +336,10 @@ static void FreeResources()
     DeleteEBO(g_EBO);
     DeleteVBO(g_VBO);
     DeleteShader(g_DefaultShader);
+    DeleteVAO(g_LightVAO);
+    DeleteEBO(g_LightVBO);
+    DeleteVBO(g_LightEBO);
+    DeleteShader(g_LightShader);
     DeleteTexture(g_Texture);
 }
 

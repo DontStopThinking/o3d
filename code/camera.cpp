@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
@@ -18,13 +20,11 @@ Camera CreateCamera(const int windowWidth, const int windowHeight, const glm::ve
     return result;
 }
 
-void SetCameraMatrix(
-    const Camera& camera,
+void UpdateCameraMatrix(
+    Camera& camera,
     const float fovDegrees,
     const float nearPlane,
-    const float farPlane,
-    const u32 shader,
-    const char* const uniform
+    const float farPlane
 )
 {
     glm::mat4 view = glm::mat4(1.0f);
@@ -43,17 +43,26 @@ void SetCameraMatrix(
         farPlane
     );
 
-    glUniformMatrix4fv(
-        glGetUniformLocation(shader, uniform),
-        1,
-        GL_FALSE,
-        glm::value_ptr(proj * view)
-    );
+    camera.m_CameraMatrix = proj * view;
 }
 
 static bool g_CameraFirstClick = true;
 
-void UpdateCameraInput(Camera& camera, GLFWwindow* window, const float dt)
+void ExportCameraMatrixToShader(
+    const Camera& camera,
+    const u32 shader,
+    const char *const uniform
+)
+{
+    glUniformMatrix4fv(
+        glGetUniformLocation(shader, uniform),
+        1,
+        GL_FALSE,
+        glm::value_ptr(camera.m_CameraMatrix)
+    );
+}
+
+void UpdateCameraInput(Camera &camera, GLFWwindow *window, const float dt)
 {
     const glm::vec3 right = glm::normalize(glm::cross(camera.m_Orientation, camera.m_Up));
 

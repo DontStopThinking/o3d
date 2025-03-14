@@ -36,7 +36,7 @@ u32 CreateShader(const char* const vertexFile, const char* const fragmentFile)
     // Create vertex shader.
     const u32 vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexSource, nullptr); // Specify shader source.
-    LOG_INFO("Compiling vertex shader...");
+    LOG_INFO("Compiling vertex shader \"%s\"...", vertexFile);
     glCompileShader(vertexShader); // Compile the shader.
 
     // Check shader compile error.
@@ -47,19 +47,19 @@ u32 CreateShader(const char* const vertexFile, const char* const fragmentFile)
         constexpr u32 size = 512;
         char infoLog[size] = {};
         glGetShaderInfoLog(vertexShader, size, nullptr, infoLog);
-        LOG_ERROR("Vertex shader compilation failed\n%s", infoLog);
+        LOG_ERROR("Vertex shader \"%s\" compilation failed\n%s", vertexFile, infoLog);
 
         return result;
     }
     else
     {
-        LOG_INFO("Successfully compiled vertex shader.");
+        LOG_INFO("Successfully compiled vertex shader \"%s\".", vertexFile);
     }
 
     // Create fragment shader.
     const u32 fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentSource, nullptr); // Specify shader source.
-    LOG_INFO("Compiling fragment shader...");
+    LOG_INFO("Compiling fragment shader \"%s\"...", fragmentFile);
     glCompileShader(fragmentShader); // Compile the shader.
 
     // Check shader compile error.
@@ -69,13 +69,13 @@ u32 CreateShader(const char* const vertexFile, const char* const fragmentFile)
         constexpr u32 size = 512;
         char infoLog[size] = {};
         glGetShaderInfoLog(fragmentShader, size, nullptr, infoLog);
-        LOG_ERROR("Fragment shader compilation failed\n%s", infoLog);
+        LOG_ERROR("Fragment shader \"%s\" compilation failed\n%s", fragmentFile, infoLog);
 
         return result;
     }
     else
     {
-        LOG_INFO("Successfully compiled fragment shader.");
+        LOG_INFO("Successfully compiled fragment shader \"%s\".", fragmentFile);
     }
 
     // Create shader program (final linked version with multiple shaders combined).
