@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\code\camera.cpp" />
     <ClCompile Include="..\..\code\graphics\ebo.cpp" />
     <ClCompile Include="..\..\code\graphics\shader.cpp" />
     <ClCompile Include="..\..\code\graphics\texture.cpp" />
@@ -21,6 +22,7 @@
     <ClCompile Include="..\..\extern\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\code\camera.h" />
     <ClInclude Include="..\..\code\common.h" />
     <ClInclude Include="..\..\code\graphics\ebo.h" />
     <ClInclude Include="..\..\code\graphics\shader.h" />

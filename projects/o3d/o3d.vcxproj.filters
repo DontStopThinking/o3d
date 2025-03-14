@@ -21,6 +21,7 @@
       <Filter>graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\stb.cpp" />
+    <ClCompile Include="..\..\code\camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extern">
@@ -75,6 +76,7 @@
     <ClInclude Include="..\..\code\graphics\texture.h">
       <Filter>graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\data\shaders\default.frag">

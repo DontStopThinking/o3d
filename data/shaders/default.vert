@@ -7,18 +7,13 @@ layout (location = 2) in vec2 aTex; // Take an input texture coordinate in locat
 out vec3 color; // Output a color for the fragment shader.
 out vec2 texCoord; // Output a texture coordinate for the fragment shader.
 
-// A uniform is a variable that can be accessed from C++ and from other shaders.
-uniform float scale;
-
-// The matrices needed for 3D viewing with perspective.
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 proj;
+// Input camera matrix (which is the view + projection matrix).
+uniform mat4 camMatrix;
 
 void main()
 {
     // Set position of the output vertex.
-    gl_Position = proj * view * model * vec4(aPos, 1.0);
+    gl_Position = camMatrix * vec4(aPos, 1.0);
     color = aColor;
     texCoord = aTex;
 }

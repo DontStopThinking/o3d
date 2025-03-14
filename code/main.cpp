@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "common.h"
+#include "camera.h"
 #include "graphics/vao.h"
 #include "graphics/vbo.h"
 #include "graphics/ebo.h"
@@ -33,10 +34,7 @@ static u32 g_VBO = -1;
 static u32 g_EBO = -1;
 static u32 g_DefaultShader = 0;
 static Texture g_Texture = {};
-
-static u32 g_UniformScale = -1;
-
-static float g_Rotation = 0.0f;
+static Camera g_Camera = {};
 
 static RenderMethod g_RenderMethod = RenderMethod::Fill;
 
@@ -120,9 +118,6 @@ static bool Initialize()
     UnbindVBO();
     UnbindEBO();
 
-    // Get ID of uniform variable called "scale".
-    g_UniformScale = glGetUniformLocation(g_DefaultShader, "scale");
-
     // Texture
     stbi_set_flip_vertically_on_load(true); // OpenGL reads images from bottom-left corder to top-right corner.
                                             // Whereas STB_Image by default reads them from the top-left corner
@@ -139,10 +134,12 @@ static bool Initialize()
 
     SetTextureUnit(g_DefaultShader, "tex0", 0);
 
+    g_Camera = CreateCamera(g_WindowWidth, g_WindowHeight, glm::vec3(0.0f, 0.0f, 2.0f));
+
     return true;
 }
 
-static void ProcessInput()
+static void ProcessInput(const float dt)
 {
     glfwPollEvents();
 
@@ -169,11 +166,12 @@ static void ProcessInput()
             LOG_INFO("Set RenderMethod to \"RenderMethod::Fill\"");
         }
     }
+
+    UpdateCameraInput(g_Camera, g_Window, dt);
 }
 
 static void Update(const float dt)
 {
-    g_Rotation += 30.0f * dt;
 }
 
 static void Render()
@@ -183,32 +181,17 @@ static void Render()
 
     ActivateShader(g_DefaultShader);
 
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 proj = glm::mat4(1.0f);
-
-    view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-    proj = glm::perspective(
-        glm::radians(45.0f), scast<float>(g_WindowWidth / g_WindowHeight), 0.1f, 100.0f
+    SetCameraMatrix(
+        g_Camera,
+        45.0f,
+        0.1f,
+        100.0f,
+        g_DefaultShader,
+        "camMatrix"
     );
-
-    // Make our model rotate.
-    model = glm::rotate(model, glm::radians(g_Rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    i32 modelLoc = glGetUniformLocation(g_DefaultShader, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-    i32 viewLoc = glGetUniformLocation(g_DefaultShader, "view");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-    i32 projLoc = glGetUniformLocation(g_DefaultShader, "proj");
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
     // Set texture.
     BindTexture(g_Texture);
-
-    // Set the scale uniform variable.
-    glUniform1f(g_UniformScale, 0.5f);
 
     BindVAO(g_VAO);
 
@@ -253,7 +236,7 @@ int main()
             deltaTime = currTime - prevTime;
             prevTime = currTime;
 
-            ProcessInput();
+            ProcessInput(scast<float>(deltaTime));
 
             Update(scast<float>(deltaTime));
 
