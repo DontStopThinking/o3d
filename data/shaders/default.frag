@@ -12,8 +12,9 @@ in vec3 currPos;
 // This fragment shader outputs a vec4 color.
 out vec4 FragColor;
 
-// Which texture unit to use, specified from C++.
+// Which texture units to use, specified from C++.
 uniform sampler2D tex0;
+uniform sampler2D tex1;
 // Color of the light, specified from C++.
 uniform vec4 lightColor;
 // Position of the light, specified from C++.
@@ -35,8 +36,8 @@ void main()
     float specularLight = 0.50f;
     vec3 viewDir = normalize(camPos - currPos);
     vec3 reflectionDir = reflect(-lightDir, myNormal);
-    float specAmount = pow(max(dot(viewDir, reflectionDir), 0.0f), 8);
+    float specAmount = pow(max(dot(viewDir, reflectionDir), 0.0f), 16);
     float specular = specAmount * specularLight;
 
-    FragColor = texture(tex0, texCoord) * lightColor * (diffuse + ambient + specular);
+    FragColor = (texture(tex0, texCoord) * (diffuse + ambient) + texture(tex1, texCoord).r * specular) * lightColor;
 }

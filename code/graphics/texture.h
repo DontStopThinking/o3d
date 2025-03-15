@@ -8,6 +8,7 @@ struct Texture
 {
     u32 m_TextureId;
     GLenum m_Type;
+    u32 m_Unit;
 };
 
 Texture CreateTexture(

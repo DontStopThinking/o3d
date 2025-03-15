@@ -15,6 +15,7 @@ Texture CreateTexture(
     Texture result = {};
 
     result.m_Type = texType;
+    result.m_Unit = slot;
 
     i32 imgWidth, imgHeight, numOfColorChannels;
     u8* const imgBytes = stbi_load(
@@ -22,7 +23,8 @@ Texture CreateTexture(
     );
 
     glGenTextures(1, &result.m_TextureId);
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0 + slot);
+
     glBindTexture(GL_TEXTURE_2D, result.m_TextureId);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
@@ -31,7 +33,7 @@ Texture CreateTexture(
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgBytes);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, format, GL_UNSIGNED_BYTE, imgBytes);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(imgBytes);
@@ -50,6 +52,7 @@ void SetTextureUnit(const u32 shaderId, const char *const uniform, const u32 uni
 
 void BindTexture(const Texture texture)
 {
+    glActiveTexture(GL_TEXTURE0 + texture.m_Unit);
     glBindTexture(GL_TEXTURE_2D, texture.m_TextureId);
 }
 
@@ -60,5 +63,5 @@ void UnbindTexture(const Texture texture)
 
 void DeleteTexture(const Texture texture)
 {
-    glDeleteTextures(1, &texture.m_Type);
+    glDeleteTextures(1, &texture.m_TextureId);
 }

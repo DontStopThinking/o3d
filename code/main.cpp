@@ -38,42 +38,23 @@ static u32 g_LightEBO = -1;
 static u32 g_DefaultShader = -1;
 static u32 g_LightShader = -1;
 static Texture g_Texture = {};
+static Texture g_TextureSpecular = {};
 static Camera g_Camera = {};
 
 static RenderMethod g_RenderMethod = RenderMethod::Fill;
 
 constexpr float VERTICES[] =
 { //     COORDINATES     /        COLORS           /   TexCoord   /       Normals
-    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
-
-    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
-
-    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-
-     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
-     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
-     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
-
-     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
-    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
-     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
+    -1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,		0.0f, 1.0f, 0.0f,
+    -1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,		0.0f, 1.0f, 0.0f,
+     1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,		0.0f, 1.0f, 0.0f,
+     1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 0.0f,		0.0f, 1.0f, 0.0f,
 };
 
 constexpr u32 INDICES[] =
 {
-    0, 1, 2, // Bottom side
-    0, 2, 3, // Bottom side
-    4, 6, 5, // Left side
-    7, 9, 8, // Non-facing side
-    10, 12, 11, // Right side
-    13, 15, 14 // Facing side
+    0, 1, 2,
+    0, 2, 3,
 };
 
 constexpr float LIGHT_VERTICES[] =
@@ -235,14 +216,22 @@ static bool Initialize()
                                             // behaviour more similar to OpenGL.
 
     g_Texture = CreateTexture(
-        "textures/brick.png",
+        "textures/planks.png",
         GL_TEXTURE_2D,
-        GL_TEXTURE0,
+        0,
         GL_RGBA,
         GL_UNSIGNED_BYTE
     );
-
     SetTextureUnit(g_DefaultShader, "tex0", 0);
+
+    g_TextureSpecular = CreateTexture(
+        "textures/planksSpec.png",
+        GL_TEXTURE_2D,
+        1,
+        GL_RED,
+        GL_UNSIGNED_BYTE
+    );
+    SetTextureUnit(g_DefaultShader, "tex1", 1);
 
     // SECTION: Camera
     g_Camera = CreateCamera(g_WindowWidth, g_WindowHeight, glm::vec3(0.0f, 0.0f, 2.0f));
@@ -303,6 +292,7 @@ static void Render()
 
     // Set texture.
     BindTexture(g_Texture);
+    BindTexture(g_TextureSpecular);
 
     BindVAO(g_VAO);
 
